@@ -12,6 +12,10 @@ def lookup_email(email):
         "Facebook": f"site:facebook.com \"{email}\"",
         "Instagram": f"site:instagram.com \"{email}\"",
         "GitHub": f"site:github.com \"{email}\"",
+        "Pinterest": f"site:pinterest.com \"{email}\"",
+        "Quora": f"site:quora.com \"{email}\"",
+        "Reddit": f"site:reddit.com \"{email}\"",
+        "Flickr": f"site:flickr.com \"{email}\"",
     }
 
     print_info(f"Searching for {email} across social media...")
@@ -47,5 +51,35 @@ def lookup_email(email):
     except Exception as e:
         print_error(f"General search failed: {e}")
 
-    # Mentioning Breach checking
-    print_info("Note: For deep breach analysis, consider using HaveIBeenPwned or DeHashed (requires API keys).")
+    # Breach/Leak Search
+    print_info(f"Checking for potential leaks/breaches related to {email}...")
+    leak_queries = [
+        f'site:pastebin.com "{email}"',
+        f'site:ghostbin.com "{email}"',
+        f'site:leaked.site "{email}"',
+        f'site:breachforums.is "{email}"',
+        f'"{email}" leak',
+        f'"{email}" database'
+    ]
+
+    found_leaks = []
+    for q in leak_queries:
+        try:
+            for res in search(q, num_results=2):
+                found_leaks.append(res)
+        except Exception:
+            pass
+
+    if found_leaks:
+        print_success(f"Potential leak mentions found:")
+        for res in set(found_leaks):
+            print(f"  - [LEAK MENTION] {res}")
+    else:
+        print_warning("No public leak mentions found in common paste sites.")
+
+    return {
+        "email": email,
+        "social_profiles": found_profiles,
+        "leaks": found_leaks,
+        "web_matches": general_results
+    }

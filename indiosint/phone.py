@@ -47,5 +47,28 @@ def lookup_phone(phone_number):
         else:
             print_warning("No direct web matches found for the phone number.")
 
+        # Leak search for phone
+        print_info(f"Checking for potential leaks related to phone: {phone_number}")
+        leak_results = []
+        try:
+            for res in search(f'"{phone_number}" leak OR "{phone_number}" database', num_results=3):
+                leak_results.append(res)
+        except:
+            pass
+
+        if leak_results:
+            print_success(f"Found potential leak mentions for phone:")
+            for res in leak_results:
+                print(f"  - {res}")
+
+        return {
+            "phone": phone_number,
+            "location": region,
+            "carrier": operator,
+            "web_matches": results,
+            "leaks": leak_results
+        }
+
     except Exception as e:
         print_error(f"Error during phone lookup: {e}")
+        return None
