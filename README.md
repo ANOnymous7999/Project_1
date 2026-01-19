@@ -30,7 +30,7 @@ python main.py -h
 
 - **Phone Search**:
   ```bash
-  python main.py -p +919876543210
+  python main.py -p +919xxxxxxxxx
   ```
 
 - **Email Search**:
