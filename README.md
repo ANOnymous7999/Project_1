@@ -53,6 +53,11 @@ python main.py -h
   python main.py -e victim@example.com -s -o investigation_report.json
   ```
 
+- **Update the tool**:
+  ```bash
+  python main.py --update
+  ```
+
 ## Disclaimer
 
 This tool is for educational and investigative purposes only. Always respect privacy and follow legal guidelines when performing OSINT.
