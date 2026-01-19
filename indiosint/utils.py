@@ -43,6 +43,20 @@ def extract_potential_name(url):
             return parts[3]
     return None
 
+def safe_search(query, num=10):
+    """A wrapper for google search with better error handling."""
+    from googlesearch import search
+    try:
+        return list(search(query, num_results=num))
+    except Exception as e:
+        if "429" in str(e):
+            print_error("Google Rate Limit hit (429). Try again later or use a VPN.")
+        elif "Timeout" in str(e) or "HTTPSConnectionPool" in str(e):
+            print_error("Connection timeout. Please check your internet or try a VPN.")
+        else:
+            print_error(f"Search failed: {e}")
+        return []
+
 def extract_emails(text):
     """Extract emails from a block of text."""
     return list(set(re.findall(r'[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+', text.lower())))

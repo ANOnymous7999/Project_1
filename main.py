@@ -1,5 +1,6 @@
 import argparse
 import sys
+from colorama import Fore, Style
 from indiosint.utils import print_banner, print_info, print_error, print_success, extract_potential_name
 from indiosint.phone import lookup_phone
 from indiosint.email import lookup_email

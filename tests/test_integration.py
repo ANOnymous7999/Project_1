@@ -9,7 +9,7 @@ from indiosint.utils import extract_emails, extract_phones, extract_image_urls
 
 class TestIndiOSINTIntegration(unittest.TestCase):
 
-    @patch('indiosint.phone.search')
+    @patch('indiosint.phone.safe_search')
     def test_phone_module(self, mock_search):
         mock_search.return_value = ['Result with victim@gmail.com and http://img.com/1.jpg']
         result = lookup_phone("+919876543210")
@@ -19,7 +19,7 @@ class TestIndiOSINTIntegration(unittest.TestCase):
         self.assertIn('victim@gmail.com', result['associated_emails'])
         self.assertIn('http://img.com/1.jpg', result['images'])
 
-    @patch('indiosint.email.search')
+    @patch('indiosint.email.safe_search')
     def test_email_module(self, mock_search):
         mock_search.return_value = ['Found +919988776655 here']
         result = lookup_email("test@example.com")
@@ -28,7 +28,7 @@ class TestIndiOSINTIntegration(unittest.TestCase):
         self.assertEqual(result['email'], "test@example.com")
         self.assertIn('+919988776655', result['associated_phones'])
 
-    @patch('indiosint.name.search')
+    @patch('indiosint.name.safe_search')
     def test_name_module(self, mock_search):
         mock_search.return_value = ['John Doe is on linkedin.com/in/johndoe']
         result = lookup_name("John Doe", "Delhi")
@@ -37,7 +37,7 @@ class TestIndiOSINTIntegration(unittest.TestCase):
         self.assertEqual(result['name'], "John Doe")
         self.assertTrue(len(result['social_profiles']) >= 0)
 
-    @patch('indiosint.vehicle.search')
+    @patch('indiosint.vehicle.safe_search')
     def test_vehicle_module(self, mock_search):
         mock_search.return_value = ['MH01AB1234 challan found']
         result = lookup_vehicle("MH01AB1234")
