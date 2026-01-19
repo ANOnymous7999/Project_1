@@ -1,5 +1,5 @@
 from googlesearch import search
-from .utils import print_info, print_success, print_error, print_warning
+from .utils import print_info, print_success, print_error, print_warning, extract_phones, extract_image_urls
 import requests
 
 def lookup_email(email):
@@ -77,9 +77,25 @@ def lookup_email(email):
     else:
         print_warning("No public leak mentions found in common paste sites.")
 
+    # Cross-linking: Search for phone with email
+    print_info(f"Searching for phone numbers associated with {email}...")
+    associated_phones = []
+    found_images = []
+    try:
+        for res in search(f'"{email}" "91" OR "{email}" "+91"', num_results=5):
+            associated_phones.extend(extract_phones(res))
+            found_images.extend(extract_image_urls(res))
+    except:
+        pass
+
+    if associated_phones:
+        print_success(f"Potential associated phones found: {list(set(associated_phones))}")
+
     return {
         "email": email,
         "social_profiles": found_profiles,
         "leaks": found_leaks,
-        "web_matches": general_results
+        "web_matches": general_results,
+        "associated_phones": list(set(associated_phones)),
+        "images": list(set(found_images))
     }

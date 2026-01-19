@@ -45,4 +45,21 @@ def extract_potential_name(url):
 
 def extract_emails(text):
     """Extract emails from a block of text."""
-    return re.findall(r'[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+', text.lower())
+    return list(set(re.findall(r'[a-z0-9\.\-+_]+@[a-z0-9\.\-+_]+\.[a-z]+', text.lower())))
+
+def extract_phones(text):
+    """Extract Indian phone numbers from a block of text."""
+    # Matches +91, 91, or just 10 digit numbers
+    patterns = [
+        r'\+91[6-9]\d{9}',
+        r'91[6-9]\d{9}',
+        r'\b[6-9]\d{9}\b'
+    ]
+    results = []
+    for p in patterns:
+        results.extend(re.findall(p, text))
+    return list(set(results))
+
+def extract_image_urls(text):
+    """Simple extraction of image-like URLs."""
+    return re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+\.(?:jpg|jpeg|png|gif|webp)', text)

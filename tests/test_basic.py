@@ -1,6 +1,7 @@
 import unittest
 from indiosint.phone import lookup_phone
-from indiosint.utils import print_banner, extract_potential_name, extract_emails
+from indiosint.utils import print_banner, extract_potential_name, extract_emails, extract_phones
+from indiosint.intelligence import IntelligenceEngine
 
 class TestIndiOSINT(unittest.TestCase):
     def test_banner(self):
@@ -26,6 +27,19 @@ class TestIndiOSINT(unittest.TestCase):
         emails = extract_emails("Contact me at test@example.com or info@domain.in")
         self.assertIn("test@example.com", emails)
         self.assertIn("info@domain.in", emails)
+
+        # Test phone extraction
+        phones = extract_phones("Call +919876543210 or 9876543211")
+        self.assertIn("+919876543210", phones)
+
+    def test_intelligence_engine(self):
+        engine = IntelligenceEngine()
+        results = {
+            'phone': {'phone': '+919876543210', 'associated_emails': ['victim@example.com']},
+            'email': {'email': 'victim@example.com'}
+        }
+        links, score = engine.get_summary(results)
+        self.assertTrue(any("HIGH CONFIDENCE" in l for l in links))
 
 if __name__ == "__main__":
     unittest.main()

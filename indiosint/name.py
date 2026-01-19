@@ -1,5 +1,5 @@
 from googlesearch import search
-from .utils import print_info, print_success, print_error, print_warning
+from .utils import print_info, print_success, print_error, print_warning, extract_emails, extract_phones, extract_image_urls
 
 def lookup_name(name, city=None):
     query_name = f'"{name}"'
@@ -70,10 +70,22 @@ def lookup_name(name, city=None):
     except Exception as e:
         print_error(f"General search failed: {e}")
 
+    # Extraction from all matches
+    all_text = " ".join(social_matches + news_matches + general_matches)
+    found_emails = extract_emails(all_text)
+    found_phones = extract_phones(all_text)
+    found_images = extract_image_urls(all_text)
+
+    if found_emails: print_success(f"Found associated emails: {found_emails}")
+    if found_phones: print_success(f"Found associated phones: {found_phones}")
+
     return {
         "name": name,
         "city": city,
         "social_profiles": social_matches,
         "news_records": news_matches,
-        "web_matches": general_matches
+        "web_matches": general_matches,
+        "associated_emails": found_emails,
+        "associated_phones": found_phones,
+        "images": found_images
     }

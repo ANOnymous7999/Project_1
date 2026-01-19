@@ -4,10 +4,13 @@ IndiOSINT is an Open Source Intelligence (OSINT) tool specifically designed for 
 
 ## Features
 
-- **Phone Intelligence**: Basic info (carrier, region) and web search for Indian phone numbers.
-- **Email Intelligence**: Social media profile discovery and general web search.
-- **Name Search**: Targeted searching across Indian news outlets, legal databases (`IndianKanoon`, `LiveLaw`), and social media.
-- **Indian Focus**: Automatically handles Indian phone formatting and prioritizes Indian sources.
+- **Phone Intelligence**: Basic info, web search, and cross-linking to emails/images.
+- **Email Intelligence**: Social media discovery, leak detection, and associated phone number extraction.
+- **Smart Chaining**: Automatically investigates discovered identifiers (names, emails) from search results.
+- **Deep Scraping**: Extracts additional metadata and images from discovered social media profiles.
+- **Vehicle Intelligence**: Searches for Indian vehicle registration details and traffic challans.
+- **Intelligence Engine**: Uses a weighted scoring model to cross-verify and validate connected data.
+- **Indian Focus**: Optimized for Indian phone formats, news, and legal databases.
 
 ## Installation
 
@@ -38,6 +41,16 @@ python main.py -h
 - **Name Search**:
   ```bash
   python main.py -n "John Doe" -c "Mumbai"
+  ```
+
+- **Vehicle Search**:
+  ```bash
+  python main.py -v "MH01AB1234"
+  ```
+
+- **Smart Mode with Intelligence Validation**:
+  ```bash
+  python main.py -e victim@example.com -s -o investigation_report.json
   ```
 
 ## Disclaimer
