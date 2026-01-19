@@ -1,7 +1,12 @@
 import argparse
 import sys
+import colorama
 from colorama import Fore, Style
-from indiosint.utils import print_banner, print_info, print_error, print_success, extract_potential_name
+from indiosint.utils import print_banner, print_info, print_error, print_success, extract_potential_name, print_result
+
+# Initialize colorama
+colorama.init(autoreset=True)
+
 from indiosint.phone import lookup_phone
 from indiosint.email import lookup_email
 from indiosint.name import lookup_name
@@ -79,29 +84,35 @@ def main():
     print("\n" + "="*50)
     print_info("Investigation Complete. Victim Profile Summary:")
     print("="*50)
+
+    # Use global colorama constants explicitly to avoid any potential scope issues
+    CYAN = colorama.Fore.CYAN
+    RED = colorama.Fore.RED
+    RESET = colorama.Style.RESET_ALL
+
     for target_type, data in results.items():
         if not data: continue
 
         if target_type == 'phone':
-            print(f"{Fore.CYAN}[PHONE]{Style.RESET_ALL} {data.get('phone')} | {data.get('location')} | {data.get('carrier')}")
-            if data.get('leaks'): print(f"  {Fore.RED}[!] Leaks found: {len(data['leaks'])}{Style.RESET_ALL}")
+            print_result("phone", f"{data.get('phone')} | {data.get('location')} | {data.get('carrier')}")
+            if data.get('leaks'): print(f"  {RED}[!] Leaks found: {len(data['leaks'])}{RESET}")
             if data.get('associated_emails'): print(f"  - Connected Emails: {', '.join(data['associated_emails'])}")
             if data.get('images'): print(f"  - Images found: {len(data['images'])}")
 
         elif 'email' in target_type:
-            print(f"{Fore.CYAN}[EMAIL]{Style.RESET_ALL} {data.get('email')}")
+            print_result("email", data.get('email'))
             if data.get('social_profiles'): print(f"  - Profiles: {len(data['social_profiles'])}")
-            if data.get('leaks'): print(f"  {Fore.RED}[!] Leaks found: {len(data['leaks'])}{Style.RESET_ALL}")
+            if data.get('leaks'): print(f"  {RED}[!] Leaks found: {len(data['leaks'])}{RESET}")
             if data.get('associated_phones'): print(f"  - Connected Phones: {', '.join(data['associated_phones'])}")
             if data.get('images'): print(f"  - Images found: {len(data['images'])}")
 
         elif 'name' in target_type:
-            print(f"{Fore.CYAN}[NAME]{Style.RESET_ALL} {data.get('name')}")
+            print_result("name", data.get('name'))
             if data.get('news_records'): print(f"  - News/Legal matches: {len(data['news_records'])}")
             if data.get('social_profiles'): print(f"  - Social profiles: {len(data['social_profiles'])}")
 
         elif target_type == 'vehicle':
-            print(f"{Fore.CYAN}[VEHICLE]{Style.RESET_ALL} Query: {data.get('query')}")
+            print_result("vehicle", data.get('query'))
             if data.get('records'): print(f"  - Records found: {len(data['records'])}")
 
     if verified_links:
@@ -123,4 +134,8 @@ if __name__ == "__main__":
         print("\nExiting...")
         sys.exit(0)
     except Exception as e:
-        print_error(f"An unexpected error occurred: {e}")
+        # Final fallback print if colorama fails
+        try:
+            print_error(f"An unexpected error occurred: {e}")
+        except:
+            print(f"[!] An unexpected error occurred: {e}")

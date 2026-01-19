@@ -16,6 +16,9 @@ def print_error(message):
 def print_warning(message):
     print(f"{Fore.YELLOW}[!] {message}{Style.RESET_ALL}")
 
+def print_result(label, value, color=Fore.CYAN):
+    print(f"{color}[{label.upper()}]{Style.RESET_ALL} {value}")
+
 def print_banner():
     banner = rf"""{Fore.CYAN}
   _____           _ _  ____   _____ _____ _   _ _______
