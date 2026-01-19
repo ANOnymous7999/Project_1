@@ -1,12 +1,19 @@
 import argparse
 import sys
-from indiosint.utils import print_banner, print_info, print_error, print_success, extract_potential_name
+import colorama
+from colorama import Fore, Style
+from indiosint.utils import print_banner, print_info, print_error, print_success, extract_potential_name, print_result
+
+# Initialize colorama
+colorama.init(autoreset=True)
+
 from indiosint.phone import lookup_phone
 from indiosint.email import lookup_email
 from indiosint.name import lookup_name
 from indiosint.vehicle import lookup_vehicle
 from indiosint.scraper import scrape_page
 from indiosint.intelligence import IntelligenceEngine
+from indiosint.updater import check_for_updates, perform_update
 
 def main():
     print_banner()
@@ -19,12 +26,18 @@ def main():
     parser.add_argument("-s", "--smart", action="store_true", help="Enable smart mode (auto-connect clues)")
     parser.add_argument("-v", "--vehicle", help="Vehicle number or owner name to search for vehicle info")
     parser.add_argument("-o", "--output", help="Output file to save results (JSON)")
+    parser.add_argument("--update", action="store_true", help="Check for and install updates from GitHub")
 
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
 
     args = parser.parse_args()
+
+    if args.update:
+        if check_for_updates():
+            perform_update()
+        sys.exit(0)
 
     results = {}
     found_names = set()
@@ -78,29 +91,30 @@ def main():
     print("\n" + "="*50)
     print_info("Investigation Complete. Victim Profile Summary:")
     print("="*50)
+
     for target_type, data in results.items():
         if not data: continue
 
         if target_type == 'phone':
-            print(f"{Fore.CYAN}[PHONE]{Style.RESET_ALL} {data.get('phone')} | {data.get('location')} | {data.get('carrier')}")
+            print_result("phone", f"{data.get('phone')} | {data.get('location')} | {data.get('carrier')}")
             if data.get('leaks'): print(f"  {Fore.RED}[!] Leaks found: {len(data['leaks'])}{Style.RESET_ALL}")
             if data.get('associated_emails'): print(f"  - Connected Emails: {', '.join(data['associated_emails'])}")
             if data.get('images'): print(f"  - Images found: {len(data['images'])}")
 
         elif 'email' in target_type:
-            print(f"{Fore.CYAN}[EMAIL]{Style.RESET_ALL} {data.get('email')}")
+            print_result("email", data.get('email'))
             if data.get('social_profiles'): print(f"  - Profiles: {len(data['social_profiles'])}")
             if data.get('leaks'): print(f"  {Fore.RED}[!] Leaks found: {len(data['leaks'])}{Style.RESET_ALL}")
             if data.get('associated_phones'): print(f"  - Connected Phones: {', '.join(data['associated_phones'])}")
             if data.get('images'): print(f"  - Images found: {len(data['images'])}")
 
         elif 'name' in target_type:
-            print(f"{Fore.CYAN}[NAME]{Style.RESET_ALL} {data.get('name')}")
+            print_result("name", data.get('name'))
             if data.get('news_records'): print(f"  - News/Legal matches: {len(data['news_records'])}")
             if data.get('social_profiles'): print(f"  - Social profiles: {len(data['social_profiles'])}")
 
         elif target_type == 'vehicle':
-            print(f"{Fore.CYAN}[VEHICLE]{Style.RESET_ALL} Query: {data.get('query')}")
+            print_result("vehicle", data.get('query'))
             if data.get('records'): print(f"  - Records found: {len(data['records'])}")
 
     if verified_links:
@@ -122,4 +136,10 @@ if __name__ == "__main__":
         print("\nExiting...")
         sys.exit(0)
     except Exception as e:
-        print_error(f"An unexpected error occurred: {e}")
+        # Final fallback print if colorama fails
+        try:
+            print_error(f"An unexpected error occurred: {e}")
+        except NameError:
+            print(f"[!] An unexpected error occurred: {e}")
+        except Exception:
+             print(f"[!] Critical error: {e}")

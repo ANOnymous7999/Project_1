@@ -30,7 +30,7 @@ python main.py -h
 
 - **Phone Search**:
   ```bash
-  python main.py -p +919876543210
+  python main.py -p +919xxxxxxxxx
   ```
 
 - **Email Search**:
@@ -51,6 +51,11 @@ python main.py -h
 - **Smart Mode with Intelligence Validation**:
   ```bash
   python main.py -e victim@example.com -s -o investigation_report.json
+  ```
+
+- **Update the tool**:
+  ```bash
+  python main.py --update
   ```
 
 ## Disclaimer

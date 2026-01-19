@@ -1,5 +1,4 @@
-from googlesearch import search
-from .utils import print_info, print_success, print_error, print_warning
+from .utils import print_info, print_success, print_error, print_warning, safe_search
 import re
 
 def lookup_vehicle(query):
@@ -32,11 +31,7 @@ def lookup_vehicle(query):
 
     found_info = []
     for q in queries:
-        try:
-            for res in search(q, num_results=3):
-                found_info.append(res)
-        except:
-            pass
+        found_info.extend(safe_search(q, num=3))
 
     if found_info:
         print_success(f"Potential vehicle/challan records found:")

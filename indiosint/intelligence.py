@@ -42,7 +42,7 @@ class IntelligenceEngine:
             e_data = results['email']
 
             # Check if phone's associated emails contain the target email
-            if e_data['email'] in p_data.get('associated_emails', []):
+            if p_data and e_data and e_data['email'] in p_data.get('associated_emails', []):
                 verified_links.append(f"Phone {p_data['phone']} -> Email {e_data['email']} (HIGH CONFIDENCE)")
 
         confidence_score = len(verified_links) * 0.5

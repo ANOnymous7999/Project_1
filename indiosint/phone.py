@@ -1,7 +1,6 @@
 import phonenumbers
 from phonenumbers import geocoder, carrier, timezone
-from googlesearch import search
-from .utils import print_info, print_success, print_error, print_warning, extract_emails, extract_image_urls
+from .utils import print_info, print_success, print_error, print_warning, extract_emails, extract_image_urls, safe_search
 
 def lookup_phone(phone_number):
     print_info(f"Analyzing phone number: {phone_number}")
@@ -33,12 +32,7 @@ def lookup_phone(phone_number):
         # Web Search
         print_info(f"Searching for {phone_number} on the web...")
         search_query = f'"{phone_number}" OR "{phone_number[1:]}"'
-        results = []
-        try:
-            for res in search(search_query, num_results=10):
-                results.append(res)
-        except Exception as e:
-            print_error(f"Search failed: {e}")
+        results = safe_search(search_query, num=10)
 
         if results:
             print_success(f"Found {len(results)} potential web matches:")
@@ -49,12 +43,7 @@ def lookup_phone(phone_number):
 
         # Leak search for phone
         print_info(f"Checking for potential leaks related to phone: {phone_number}")
-        leak_results = []
-        try:
-            for res in search(f'"{phone_number}" leak OR "{phone_number}" database', num_results=3):
-                leak_results.append(res)
-        except:
-            pass
+        leak_results = safe_search(f'"{phone_number}" leak OR "{phone_number}" database', num=3)
 
         if leak_results:
             print_success(f"Found potential leak mentions for phone:")
@@ -65,13 +54,11 @@ def lookup_phone(phone_number):
         print_info(f"Searching for emails associated with {phone_number}...")
         associated_emails = []
         found_images = []
-        try:
-            # We use advanced dorking to find combinations
-            for res in search(f'"{phone_number}" "@gmail.com" OR "{phone_number}" "@yahoo.com"', num_results=5):
-                associated_emails.extend(extract_emails(res))
-                found_images.extend(extract_image_urls(res))
-        except:
-            pass
+        # We use advanced dorking to find combinations
+        search_res = safe_search(f'"{phone_number}" "@gmail.com" OR "{phone_number}" "@yahoo.com"', num=5)
+        for res in search_res:
+            associated_emails.extend(extract_emails(res))
+            found_images.extend(extract_image_urls(res))
 
         if associated_emails:
             print_success(f"Potential associated emails found: {list(set(associated_emails))}")

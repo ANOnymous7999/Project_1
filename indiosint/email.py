@@ -1,5 +1,4 @@
-from googlesearch import search
-from .utils import print_info, print_success, print_error, print_warning, extract_phones, extract_image_urls
+from .utils import print_info, print_success, print_error, print_warning, extract_phones, extract_image_urls, safe_search
 import requests
 
 def lookup_email(email):
@@ -22,11 +21,9 @@ def lookup_email(email):
     found_profiles = []
 
     for platform, query in platforms.items():
-        try:
-            for res in search(query, num_results=2):
-                found_profiles.append((platform, res))
-        except Exception as e:
-            print_error(f"Error searching {platform}: {e}")
+        results = safe_search(query, num=2)
+        for res in results:
+            found_profiles.append((platform, res))
 
     if found_profiles:
         print_success(f"Potential social media profiles found:")
@@ -37,19 +34,14 @@ def lookup_email(email):
 
     # General search
     print_info(f"Performing general web search for {email}...")
-    try:
-        general_results = []
-        for res in search(f'"{email}"', num_results=5):
-            general_results.append(res)
+    general_results = safe_search(f'"{email}"', num=5)
 
-        if general_results:
-            print_success(f"Found {len(general_results)} potential web matches:")
-            for res in general_results:
-                print(f"  - {res}")
-        else:
-            print_warning("No general web matches found.")
-    except Exception as e:
-        print_error(f"General search failed: {e}")
+    if general_results:
+        print_success(f"Found {len(general_results)} potential web matches:")
+        for res in general_results:
+            print(f"  - {res}")
+    else:
+        print_warning("No general web matches found.")
 
     # Breach/Leak Search
     print_info(f"Checking for potential leaks/breaches related to {email}...")
@@ -64,11 +56,7 @@ def lookup_email(email):
 
     found_leaks = []
     for q in leak_queries:
-        try:
-            for res in search(q, num_results=2):
-                found_leaks.append(res)
-        except Exception:
-            pass
+        found_leaks.extend(safe_search(q, num=2))
 
     if found_leaks:
         print_success(f"Potential leak mentions found:")
@@ -81,12 +69,10 @@ def lookup_email(email):
     print_info(f"Searching for phone numbers associated with {email}...")
     associated_phones = []
     found_images = []
-    try:
-        for res in search(f'"{email}" "91" OR "{email}" "+91"', num_results=5):
-            associated_phones.extend(extract_phones(res))
-            found_images.extend(extract_image_urls(res))
-    except:
-        pass
+    search_res = safe_search(f'"{email}" "91" OR "{email}" "+91"', num=5)
+    for res in search_res:
+        associated_phones.extend(extract_phones(res))
+        found_images.extend(extract_image_urls(res))
 
     if associated_phones:
         print_success(f"Potential associated phones found: {list(set(associated_phones))}")

@@ -3,5 +3,3 @@ beautifulsoup4
 phonenumbers
 colorama
 googlesearch-python
-scikit-learn
-numpy
